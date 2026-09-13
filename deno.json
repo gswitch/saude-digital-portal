@@ -1,0 +1,50 @@
+{
+    "version": "1.0.0",
+    "nodeModulesDir": "auto",
+    "tasks": {
+        "srv:dev": "deno run --watch -A src/app.ts",
+        "app:dev": "deno run -A npm:vite build --watch",
+        "build:app": "deno run -A npm:vite build",
+        "build:exe": "deno task build:app && deno compile --no-check --node-modules-dir=none --exclude-unused-npm --include public -o portal -A src/app.ts",
+        "secret:key": "deno run scripts/encrypt.ts --gen-key",
+        "secret:encrypt": "deno run --allow-env=PORTAL_KEY scripts/encrypt.ts",
+        "set:key": "setx PORTAL_KEY \"...\" /M",
+        "ver:major": "deno bump-version major",
+        "ver:minor": "deno bump-version minor",
+        "ver:patch": "deno bump-version patch",
+        "ver:prerelease": "deno bump-version prerelease"
+    },
+    "imports": {
+        "@/": "./",
+        "@alpinejs/mask": "npm:@alpinejs/mask@^3.17.2",
+        "@tailwindcss/forms": "npm:@tailwindcss/forms@^0.5.11",
+        "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.3.3",
+        "alpinejs": "npm:alpinejs@^3.17.2",
+        "hono": "jsr:@hono/hono@^4.13.7",
+        "@neabyte/deno-mailer": "jsr:@neabyte/deno-mailer@^0.3.0",
+        "@std/path": "jsr:@std/path@^1.1.6",
+        "@types/node": "npm:@types/node@^26.5.0",
+        "htmx.org": "npm:htmx.org@2.0.10",
+        "lodash": "npm:lodash@^4.18.1",
+        "postgres": "npm:postgres@^3.4.9",
+        "preline": "npm:preline@^5.0.0",
+        "tailwindcss": "npm:tailwindcss@^4.3.3",
+        "vite": "npm:vite@^8.2.2"
+    },
+    "unstable": ["cron"],
+    "fmt": {
+        "lineWidth": 50000,
+        "indentWidth": 4
+    },
+    "compilerOptions": {
+        "types": [
+            "./src/core/globals.d.ts"
+        ]
+    },
+    "lint": {
+        "exclude": ["./src/web/assets"],
+        "rules": {
+            "exclude": ["no-explicit-any"]
+        }
+    }
+}

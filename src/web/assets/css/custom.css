@@ -1,0 +1,12 @@
+/* Only add/override mappings here when you introduce new tokens or want to change a mapping */
+@theme inline {
+    --color-lua-background-1: var(--lua-background-1);
+}
+
+:root {
+    --lua-background-1: #faf8f7;
+}
+
+.dark {
+    --lua-background-1: #0d0b0b;
+}

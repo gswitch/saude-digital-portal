@@ -1,0 +1,10 @@
+node_modules/
+.git/
+.claude/
+.agents/
+*.exe
+portal
+settings.json
+.env*
+Dockerfile
+.dockerignore
