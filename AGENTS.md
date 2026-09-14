@@ -37,8 +37,9 @@ Ao implementar uma interface, o agente deve preferir o seguinte fluxo:
 **Distribuição:**
 - Binário único `portal.exe` via `deno task build:exe`, com `public/` embutido.
 - Em produção bastam `portal.exe` + `settings.json` na mesma pasta (o exe lê o `settings.json` ao lado dele, via `F.rootURL`) + variável de ambiente `PORTAL_KEY` (chave AES, 64 hex).
-- Segredos só cifrados com `PORTAL_KEY`: credencial SMTP no código (`sendMail`), `DATABASE_PWD` no `settings.json`. A chave nunca vai para o código. Gere chave com `deno task secret:key` e cifre com `deno task secret:encrypt "<valor>"`; trocar a chave ou a senha SMTP exige recifrar e recompilar.
+- Segredos só cifrados com `PORTAL_KEY`: credencial SMTP no código (`sendMail`), `DATABASE_PWD` no `settings.json`. A chave nunca vai para o código. Gere chave com `portal --keygen` e cifre com `portal --encrypt "<valor>"`; trocar a chave ou a senha SMTP exige recifrar e recompilar.
 - Sem `settings.json` (ex.: Cloud Run), o banco vem das variáveis `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME`, `DATABASE_USER`, `DATABASE_PWD` (cifrado) e `DATABASE_ARGS` (opcional, sufixo da string de conexão, ex.: `?sslmode=require`). Com o arquivo presente, as variáveis são ignoradas.
+- Atalho: `/cfg local` (`.claude/commands/cfg.md`) define essas variáveis em nível de máquina (`setx ... /M`, mesmo padrão do task `set:key` para `PORTAL_KEY`) para rodar o portal localmente sem `settings.json`.
 - `settings.json` fica fora do git e da imagem; o modelo versionado é `settings-sample.json`.
 - Alterou css/js/img? É preciso recompilar o exe.
 - Só pacotes npm importados pelo servidor entram no exe (`--exclude-unused-npm`); deps só de build (vite, tailwind) ficam de fora.
@@ -106,7 +107,7 @@ docker run --rm -p 8080:8080 saude-digital-image:<TAG>
 ```
 ├── public/assets/         # servido em /assets/* — css/js gerados, htmx vendorizado, img
 ├── src/
-│   ├── app.ts             # entrypoint: F.load() → db.connect() → server.start()
+│   ├── app.ts             # entrypoint: parseia flags (--keygen/--encrypt/--help/--run) → F.load() → db.connect() → server.start()
 │   ├── core/              # f.ts (global F), db.ts, cron.ts, interfaces.ts, globals.d.ts
 │   ├── services/          # VAZIA
 │   ├── workers/           # VAZIA
@@ -117,7 +118,6 @@ docker run --rm -p 8080:8080 saude-digital-image:<TAG>
 │       └── assets/        # FONTE do frontend (entra no Vite)
 ├── deno.json              # tasks, import map, fmt/lint, version (fonte de F.version)
 ├── vite.config.js         # build frontend → public/assets
-├── scripts/encrypt.ts     # gera PORTAL_KEY / cifra segredos (fora do exe)
 ├── settings-sample.json   # modelo versionado do settings.json
 ├── settings.json          # local, fora do git/imagem: porta + banco (DATABASE_PWD cifrado)
 ```
@@ -155,7 +155,9 @@ ser avaliado antes de `F` existir (`F is not defined`). No topo, importe direto 
 
 ## Fluxo e rotas
 
-`app.ts` importa `core/f.ts` (registra `F`) → `F.load()` lê `settings.json` (ou, sem ele, as variáveis `DATABASE_*`) → `db.connect()`
+`app.ts` importa `core/f.ts` (registra `F`) e trata as flags de linha de comando (`--help`,
+`--keygen`, `--encrypt <valor>`) antes de iniciar a aplicação; sem flag (ou com `--run`), segue o
+fluxo normal: `F.load()` lê `settings.json` (ou, sem ele, as variáveis `DATABASE_*`) → `db.connect()`
 decifra `DATABASE_PWD` com `PORTAL_KEY` e valida com `SELECT version(), now()` → `server.start()`. Falha em
 qualquer etapa encerra com `Deno.exit(1)`. `SIGINT`/`SIGTERM` fecham a conexão e saem com `0`.
 

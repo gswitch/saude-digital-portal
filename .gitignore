@@ -9,8 +9,9 @@
 node_modules/
 vendor/
 
-# configuração local (modelo: settings-sample.json)
-settings.json
+# configuração local: todo settings*.json da raiz, exceto o modelo
+/settings*.json
+!/settings-sample.json
 
 # build output
 *.exe

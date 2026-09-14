@@ -65,7 +65,13 @@ export async function load() {
         if (!F.loaded.cfg) {
             // settings.json tem prioridade; sem ele (ex.: Cloud Run) o banco vem das variáveis de ambiente
             if (await F.existsAsync(fileURL)) {
-                F.cfg = { ...F.cfg, ...JSON.parse(await Deno.readTextFile(fileURL)) };
+                const settings = JSON.parse(await Deno.readTextFile(fileURL));
+                const current = settings.DATA_SOURCES?.CURRENT;
+                const dataSource = current && settings.DATA_SOURCES?.[current];
+                if (!dataSource) {
+                    throw new Error(`DATA_SOURCES.CURRENT ("${current}") não encontrado em settings.json.`);
+                }
+                F.cfg = { ...F.cfg, HTTP_PORT: settings.HTTP_PORT ?? F.cfg.HTTP_PORT, ...dataSource };
             } else {
                 for (const name of ["DATABASE_HOST", "DATABASE_NAME", "DATABASE_USER", "DATABASE_PWD", "DATABASE_ARGS"] as const) {
                     const value = Deno.env.get(name);

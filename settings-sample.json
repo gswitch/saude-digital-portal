@@ -1,9 +1,14 @@
 {
     "HTTP_PORT": 80,
-    "DATABASE_HOST": "127.0.0.1",
-    "DATABASE_PORT": 5432,
-    "DATABASE_NAME": "portal",
-    "DATABASE_USER": "postgres",
-    "DATABASE_PWD": "",
-    "DATABASE_ARGS": ""
+    "DATA_SOURCES": {
+        "CURRENT": "LOCAL",
+        "LOCAL": {
+            "DATABASE_HOST": "127.0.0.1",
+            "DATABASE_PORT": 5432,
+            "DATABASE_NAME": "portal",
+            "DATABASE_USER": "postgres",
+            "DATABASE_PWD": "tfu7cqoPTKb9XCQUN0tDybtrzESZcBd1gzPzibohCTzNjb4=",
+            "DATABASE_ARGS": ""
+        }
+    }
 }

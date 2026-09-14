@@ -6,8 +6,6 @@
         "app:dev": "deno run -A npm:vite build --watch",
         "build:app": "deno run -A npm:vite build",
         "build:exe": "deno task build:app && deno compile --no-check --node-modules-dir=none --exclude-unused-npm --include public -o portal -A src/app.ts",
-        "secret:key": "deno run scripts/encrypt.ts --gen-key",
-        "secret:encrypt": "deno run --allow-env=PORTAL_KEY scripts/encrypt.ts",
         "set:key": "setx PORTAL_KEY \"...\" /M",
         "ver:major": "deno bump-version major",
         "ver:minor": "deno bump-version minor",
